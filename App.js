@@ -1,15 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
-import Home from "../driver-side/screens/Home";
-import Login from "../driver-side/screens/Login/Login"
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as React from 'react';
+import MainContainer from "./navigation/MainContainer";
+import 'react-native-reanimated';
+import * as DevClient from 'expo-dev-client';
 
 
-export default function App() {
+
+function App() {
   return (
-    <Login/>
+    <MainContainer/>
   );
 }
+
+export default App;
 
 

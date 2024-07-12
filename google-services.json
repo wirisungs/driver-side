@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "323629856312",
+    "project_id": "tp-express-driver",
+    "storage_bucket": "tp-express-driver.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:323629856312:android:6e96f01c73c8702ce218cd",
+        "android_client_info": {
+          "package_name": "com.huflitphuc2002.driverside"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCllti5IOYgvk75P0KTzgYlv9m0aBqOLzI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

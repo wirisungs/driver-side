@@ -1,55 +1,30 @@
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, TextInput, StyleSheet, Dimensions } from 'react-native'
 import React from 'react'
 
-const CustomInput = () => {
+const { width } = Dimensions.get('window');
+
+const CustomInput = ({textPlaceholder}) => {
   return (
     <View>
-        <View style={{alignItems: 'center'}}>
-            <View style={styles.inputContainer}>
-                <TextInput placeholder='Số điện thoại' style={styles.inputField} keyboardType='number-pad' placeholderTextColor="#808080" />
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput placeholder='Mật khẩu' style={styles.inputField} secureTextEntry={true} placeholderTextColor="#808080"/>
-            </View>
-        </View>
-        
-        
-        <View>
-            <TouchableOpacity>
-                <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
-            </TouchableOpacity>
-        </View>
+        <TextInput
+            style={styles.input}
+            placeholder={textPlaceholder}
+            placeholderTextColor="#aaa" 
+        />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-    inputContainer: {
-        borderWidth: 1,
-        borderRadius: '20px',
-        borderColor: '#E2E2E2',
+    input: {
+        width: width * 0.9,
         height: 50,
-        width: 345,
-        marginVertical: 10
-    },
-    inputField: {
-        fontFamily: 'Roboto-Medium',
-        fontWeight: 400,
-        fontSize: '16px',
-        fontStyle: 'normal',
-        lineHeight: '19px',
-        flex: 1,
-        paddingHorizontal: 20,
-    },
-    forgotPasswordText: {
-        fontFamily: 'Roboto-Medium',
-        fontWeight: 400,
-        fontSize: '16px',
-        fontStyle: 'normal',
-        lineHeight: '19px',
-        textAlign: 'right',
-        color: '#808080'
-    }
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 24,
+        paddingHorizontal: 10,
+        marginBottom: 20,
+      },
 })
 
 export default CustomInput

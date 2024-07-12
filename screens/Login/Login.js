@@ -1,56 +1,115 @@
-import { View, Text, SafeAreaView, StyleSheet } from 'react-native'
-import React from 'react'
-import CustomInput from '../../components/CustomInput'
-  
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, TextInput } from 'react-native';
+import { CheckBox } from 'react-native-elements';
+import Button from '../../components/Button/bundle';
+import { fonts } from '../../utils/fonts';
+import { useNavigation } from '@react-navigation/native';
 
-const Login = () => {
+
+
+
+const { width } = Dimensions.get('window');
+
+const App = () => {
+    const navigation = useNavigation();
+
+    const handleForgotPass = () => {
+        navigation.navigate("ForgotPassword");
+    }
+    const handleHomeScreen = () => {
+        navigation.navigate("HomeScreen");
+    }
+    const [isChecked, setIsChecked] = useState(false);
 
   return (
+    <View style={styles.container}>
+      <Text style={styles.title}>THIEN PHUC DRIVER</Text>
+      <Text style={styles.subtitle}>Giao hàng bằng cả tính mạng</Text>
 
-    <SafeAreaView style={{flex: 1, justifyContent: 'center'}}>
-      <View style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: '0px',
-        gap: '6px'
-      }}>
-      <Text style={styles.titleApp}>
-            TPEXPRESS DRIVER</Text>
-
-        <Text style={styles.sloganApp}>
-        Giao hàng bằng cả tính mạng
-      </Text>
+      <View>
+        <TextInput
+            style={styles.input}
+            placeholder="Số điện thoại"
+            placeholderTextColor="#aaa"
+        />
+      <TextInput
+            style={styles.input}
+            placeholder="Mật khẩu"
+            placeholderTextColor="#aaa"
+            secureTextEntry
+        />
+      </View>
+      
+      <View style={styles.row}>
+        <CheckBox
+          checked={isChecked}
+          onPress={() => setIsChecked(!isChecked)}
+          checkedColor="#03A63C"
+          uncheckedColor="#03A63C"
+          containerStyle={styles.checkboxContainer}
+          textStyle={styles.checkboxText}
+          title="Ghi nhớ mật khẩu"
+        />
+        <TouchableOpacity onPress={handleForgotPass}>
+          <Text style={styles.forgotPassword} onPress={() => navigation.navigate('ForgotPassword')}>Quên mật khẩu?</Text>
+        </TouchableOpacity>
       </View>
 
-      {/*Input field*/}
-      
-      <CustomInput/>
+      <Button text='Đăng nhập' screenName='HomeScreen'/>
+    </View>
+  );
+};
 
-    </SafeAreaView>
-  )
-}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontFamily: fonts.Medium
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#aaa',
+    marginBottom: 30,
+    fontFamily: fonts.ThinItalic
+  },
+  input: {
+    width: width * 0.9,
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 24,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: width * 0.9,
+    marginBottom: 20,
+  },
+  checkboxContainer: {
+    backgroundColor: 'transparent',
+    padding: 0,
+    borderWidth: 0,
+    flex: 1,
+  },
+  checkboxText: {
+    fontSize: 16,
+    color: '#808080',
+  },
+  forgotPassword: {
+    color: '#aaa',
+    fontSize: 16,
+  },
+});
 
-const styles = StyleSheet.create ({
-    titleApp: {
-        fontFamily: 'Roboto-Medium', 
-        fontSize:'25px', 
-        fontWeight:'600', 
-        marginBottom:'30',
-        lineHeight:'29px',
-        fontStyle: 'normal',
-        textAlign: 'center'
-    },
-    sloganApp: {
-        fontFamily: 'Roboto-Medium',
-        fontSize: '16px',
-        fontStyle: 'normal',
-        fontWeight: '400',
-        lineHeight: '19px',
-        textAlign: 'center',
-        color: '#808080'
-    }
-})
-
-
-export default Login;
+export default App;
