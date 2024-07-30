@@ -12,7 +12,20 @@
           "package_name": "com.huflitphuc2002.driverside"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "323629856312-nrrg421se25tirv8dm0turnd0vpn51o8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.huflitphuc2002.driverside",
+            "certificate_hash": "c81aa151625aa18568d870ebc6ddfe32032d8569"
+          }
+        },
+        {
+          "client_id": "323629856312-41retdgsm2k2mc2avkkfnqr4154rg49t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCllti5IOYgvk75P0KTzgYlv9m0aBqOLzI"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "323629856312-41retdgsm2k2mc2avkkfnqr4154rg49t.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "323629856312-2bdbhpr75qtk95h77be2mjgh2vvcni2f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.huflitphuc2002.driverside"
+              }
+            }
+          ]
         }
       }
     }

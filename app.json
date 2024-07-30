@@ -14,7 +14,8 @@
         }
       ],
       "@react-native-firebase/app",
-      "@react-native-firebase/auth"
+      "@react-native-firebase/auth",
+      "expo-build-properties"
     ],
     "splash": {
       "image": "./assets/splash.png",
@@ -23,7 +24,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.huflitphuc2002.driverside"
+      "bundleIdentifier": "com.huflitphuc2002.driverside",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "googleServicesFile": "./google-services.json",
@@ -40,6 +42,10 @@
       "eas": {
         "projectId": "cb829d15-172d-4bc6-a29a-ac88d3eb6842"
       }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/cb829d15-172d-4bc6-a29a-ac88d3eb6842"
     }
   }
 }

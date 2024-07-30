@@ -1,26 +1,33 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-// For standard React Native
-
-// For Expo
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
 const CustomHeader = ({headerName}) => {
+  const navigation = useNavigation();
+  const handleAccount = () => {
+    navigation.navigate("AccountScreen")
+  }
   return (
     <View>
         <LinearGradient 
-      colors={['#4CAF50', '#2E7D32']} 
+      colors={['#4CAF50', '#1C9546']} 
       style={styles.headerContainer}
     >
       <Text style={styles.headerTitle}> { headerName } </Text>
       <View style={styles.headerIcons}>
-        <Icon name="home-outline" size={30} color="#fff" />
-        <Image 
+        <TouchableOpacity onPress={() => navigation.navigate("NotificationsScreen")}>
+          <Icon name="notifications-outline" size={40} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("AccountScreen")}>
+        {/* <Image 
           source={require('../assets/avatar.jpg')} 
-          style={styles.avatar} 
-        />
+          style={styles.avatar}
+        /> */}
+        <Icon name="person-circle-outline" size={40} color="#fff" />
+        </TouchableOpacity>
       </View>
     </LinearGradient>
     </View>

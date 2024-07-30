@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
+import CustomHeader from '../../components/CustomHeader';
 
 const reviews = [
   {
@@ -47,6 +48,7 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
+      <CustomHeader headerName="Cá nhân"/>
       <View style={styles.orderStatsContainer}>
         <View style={styles.orderStat}>
           <Text style={styles.orderStatNumber}>20</Text>
@@ -70,13 +72,13 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: '#fff',
   },
   orderStatsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 16,
+    padding: 16
   },
   orderStat: {
     alignItems: 'center',
@@ -97,6 +99,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
+    padding: 16
   },
   reviewContainer: {
     flexDirection: 'row',

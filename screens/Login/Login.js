@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { CheckBox } from 'react-native-elements';
-import Button from '../../components/Button/bundle';
 import { fonts } from '../../utils/fonts';
 import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { firebase_auth } from '../../firebase/firebaseConfig';
 
 
 
@@ -16,10 +18,35 @@ const App = () => {
     const handleForgotPass = () => {
         navigation.navigate("ForgotPassword");
     }
+
+    const handleRegisterScreen = () => {
+      navigation.navigate("RegisterScreen");
+    }
+
     const handleHomeScreen = () => {
         navigation.navigate("HomeScreen");
     }
+    //Firebase Authetication
     const [isChecked, setIsChecked] = useState(false);
+
+    const [driverEmail, setDriverEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const auth = firebase_auth;
+
+    const signIn = async () => {
+      setLoading(true);
+      try {
+        const response = await signInWithEmailAndPassword(auth, driverEmail, password);
+        console.log(response);
+      } catch (error) {
+        console.log(error);
+        Alert.alert("Error", error.message); // Notify the user of the error
+      } finally {
+        setLoading(false);
+      }
+    };
+
 
   return (
     <View style={styles.container}>
@@ -29,13 +56,18 @@ const App = () => {
       <View>
         <TextInput
             style={styles.input}
-            placeholder="Số điện thoại"
+            placeholder="Email"
             placeholderTextColor="#aaa"
+            value={driverEmail}
+            onChangeText={setDriverEmail}
+            autoCapitalize="none"
         />
       <TextInput
             style={styles.input}
             placeholder="Mật khẩu"
             placeholderTextColor="#aaa"
+            value={password}
+            onChangeText={setPassword}
             secureTextEntry
         />
       </View>
@@ -55,7 +87,33 @@ const App = () => {
         </TouchableOpacity>
       </View>
 
-      <Button text='Đăng nhập' screenName='HomeScreen'/>
+      {/* <Button text='Đăng nhập' screenName='HomeScreen'/> */}
+
+      {/* Button here */}
+
+
+      { loading ? <ActivityIndicator size="large" color="#0000ff"/>
+      : <>
+        <TouchableOpacity style={styles.loginButton} onPress={signIn}>
+          <LinearGradient colors={['#04BF45', '#1C9546']} style={styles.gradient}>
+            <Text style={styles.loginButtonText}> Đăng nhập </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </>
+      }
+      {/* <TouchableOpacity style={styles.loginButton} onPress={signIn}>
+        <LinearGradient colors={['#04BF45', '#1C9546']} style={styles.gradient}>
+          <Text style={styles.loginButtonText}> Đăng nhập </Text>
+        </LinearGradient>
+      </TouchableOpacity> */}
+
+      <TouchableOpacity style={styles.loginButton} onPress = {handleRegisterScreen}>
+        <LinearGradient colors={['#04BF45', '#1C9546']} style={styles.gradient}>
+          <Text style={styles.loginButtonText}> Đăng ký </Text>
+        </LinearGradient>
+      </TouchableOpacity>
+
+
     </View>
   );
 };
@@ -109,6 +167,22 @@ const styles = StyleSheet.create({
   forgotPassword: {
     color: '#aaa',
     fontSize: 16,
+  },
+  loginButton: {
+    width: width * 0.9,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginTop: 15
+  },
+  gradient: {
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 20,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

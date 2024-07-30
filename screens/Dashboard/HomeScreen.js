@@ -1,58 +1,149 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import Button from '../../components/Button/Button';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  Dimensions,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import CustomHeader from '../../components/CustomHeader';
+import { firebase_auth } from '../../firebase/firebaseConfig';
 
 const { width } = Dimensions.get('window');
 
-
-const OrderCard = ({ order }) => {
-  return (
-    <View style={styles.orderCard}>
-      <Text style={styles.orderId}>{order.id}</Text>
-      <Text style={styles.orderInfo}>Người nhận: {order.receiver}</Text>
-      <Text style={styles.orderInfo}>Số điện thoại: {order.phone}</Text>
-      <Text style={styles.orderInfo}>Địa chỉ: {order.address}</Text>
-      <Text style={styles.orderInfo}>Note: {order.note}</Text>
-      <View style={styles.orderFooter}>
-        <View style={styles.totalContainer}>
-          <Text style={styles.orderTotal}>Tổng: </Text>
-          <Text style={styles.orderTotalAmount}>{order.total}</Text>
-        </View>
-        <TouchableOpacity style={styles.acceptButton}>
+const OrderCard = ({ orders, onAcceptOrder }) => (
+  <View style={styles.container}>
+    {orders.map((item, index) => (
+      <View key={index} style={styles.orderCard}>
+        <Text style={styles.orderId}>{item.Code}</Text>
+        <Text style={styles.orderInfo}>Người nhận: {item.ReceiverName}</Text>
+        <Text style={styles.orderInfo}>Số điện thoại: {item.SDT}</Text>
+        <Text style={styles.orderInfo}>Địa chỉ: {item.Address}</Text>
+        <Text style={styles.orderInfo}>Note: {item.Note}</Text>
+        <View style={styles.orderFooter}>
+          <View style={styles.totalContainer}>
+            <Text style={styles.orderTotal}>Tổng: </Text>
+            <Text style={styles.orderTotalAmount}>{item.Price}</Text>
+          </View>
+          <TouchableOpacity style={styles.acceptButton} onPress={() => onAcceptOrder(item.Code)}>
             <LinearGradient colors={['#04BF45', '#1C9546']} style={styles.gradient}>
               <Text style={styles.acceptButtonText}>Nhận</Text>
             </LinearGradient>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  );
-};
+    ))}
+  </View>
+);
 
 const HomeScreen = () => {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [driverEmail, setDriverEmail] = useState(null);
   const [isWorking, setIsWorking] = useState(false);
 
-  const orders = [
-    { id: 'DBAHX8QJXD', receiver: 'Trí', phone: '032322xxxxx', address: '62/2/4 Phú Xuân, Nhà Bè', note: '', total: '20.000đ' },
-    { id: 'DBAHX8QJXD', receiver: 'Trí', phone: '032322xxxxx', address: '62/2/4 Phú Xuân, Nhà Bè', note: '', total: '20.000đ' },
-    { id: 'DBAHX8QJXD', receiver: 'Trí', phone: '032322xxxxx', address: '62/2/4 Phú Xuân, Nhà Bè', note: '', total: '20.000đ' },
-    { id: 'DBAHX8QJXD', receiver: 'Trí', phone: '032322xxxxx', address: '62/2/4 Phú Xuân, Nhà Bè', note: '', total: '20.000đ' },
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch('http://10.0.2.2:4003/api/getorder');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const ordersData = await response.json();
+      setOrders(Array.isArray(ordersData) ? ordersData : []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    // Add more orders here
-  ];
+  useEffect(() => {
+    const fetchDriverEmail = async () => {
+      try {
+        const user = firebase_auth.currentUser;
+        if (user && user.email) {
+          const response = await fetch(`http://10.0.2.2:4003/api/driver/email/${user.email}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const driverData = await response.json();
+          setDriverEmail(driverData.driverEmail);
+        }
+      } catch (error) {
+        console.error('Error fetching driver email:', error);
+        setError(error);
+      }
+    };
 
-  const toggleSwitch = () => setIsWorking(previousState => !previousState);
+    fetchDriverEmail();
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleAcceptOrder = async (code) => {
+    if (!driverEmail) {
+      Alert.alert('Error', 'Driver Email is not available');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://10.0.2.2:4003/api/order/${code}/accept`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ driverEmail }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedOrder = await response.json();
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.Code === updatedOrder.Code ? updatedOrder : order
+        )
+      );
+
+      fetchData();
+
+      Alert.alert('Success', 'Đã nhận đơn thành công, vui lòng kiểm tra ở trang đơn hàng');
+    } catch (error) {
+      console.error('Error updating order:', error);
+      Alert.alert('Error', `An error occurred: ${error.message}`);
+      setError(error);
+    }
+  };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (error) {
+    return <Text>Error: {error.message}</Text>;
+  }
 
   return (
     <View style={styles.container}>
+      <CustomHeader headerName="Trang chủ" />
       <View style={styles.statusContainer}>
         <Text style={styles.statusText}>Trạng thái hoạt động</Text>
         <Switch
           trackColor={{ false: '#767577', true: '#81b0ff' }}
           thumbColor={isWorking ? '#f5dd4b' : '#f4f3f4'}
           ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
+          onValueChange={() => setIsWorking(previousState => !previousState)}
           value={isWorking}
         />
         <Text style={[styles.statusIndicator, { color: isWorking ? 'green' : 'red' }]}>
@@ -61,9 +152,11 @@ const HomeScreen = () => {
       </View>
       <Text style={styles.orderHeader}>Đơn hàng có thể nhận</Text>
       <ScrollView>
-        {orders.map((order, index) => (
-          <OrderCard key={index} order={order} />
-        ))}
+        {isWorking ? (
+          <OrderCard orders={orders} onAcceptOrder={handleAcceptOrder} />
+        ) : (
+          <Text style={styles.inactiveMessage}>Vui lòng bật trạng thái hoạt động để xem đơn hàng.</Text>
+        )}
       </ScrollView>
     </View>
   );
@@ -73,31 +166,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  header: {
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 15,
-    paddingVertical: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  headerIcons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginLeft: 10,
   },
   statusContainer: {
     flexDirection: 'row',
@@ -146,34 +214,40 @@ const styles = StyleSheet.create({
   totalContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 220
+    gap: 150,
   },
   orderTotal: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   orderTotalAmount: {
-    fontSize: 20,
+    fontSize: 25,
     color: 'red',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   acceptButton: {
     width: width * 0.5,
-    height: '50px',
+    height: 50,
     borderRadius: 20,
     overflow: 'hidden',
-    marginTop: 20
+    marginTop: 20,
   },
   acceptButtonText: {
     color: '#fff',
     fontSize: 20,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   gradient: {
     paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 20,
-  }
+  },
+  inactiveMessage: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
+    color: 'grey',
+  },
 });
 
 export default HomeScreen;

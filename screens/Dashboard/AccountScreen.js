@@ -1,29 +1,66 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import BackButton from '../../components/Button/BackButton';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+import { firebase_auth } from '../../firebase/firebaseConfig';
+
+import { signOut } from 'firebase/auth';
+const { width } = Dimensions.get('window');
 
 const AccountScreen = () => {
+  const [userInfo, setUserInfo] = useState(null);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const user = firebase_auth.currentUser;
+        if (user) {
+          const response = await fetch(`http://10.0.2.2:4003/api/driver/email/${user.email}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          setUserInfo(data);
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Failed to fetch user data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+
+  const handleLogout = async () => {
+    try {
+      await signOut(firebase_auth);
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Logout error:', error.message);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Icon name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <View style={styles.profileInfo}>
+      <View style={styles.headerContainer}>
+        <LinearGradient colors={['#04BF45', '#1C9546']} style={styles.header}>
+          <BackButton screenName='HomeScreen' />
           <Image
-            source={{ uri: 'https://example.com/user-avatar.jpg' }} // replace with actual image URL
+            source={{ uri: 'https://via.placeholder.com/150' }}
             style={styles.avatar}
           />
-          <View>
-            <Text style={styles.name}>Rutricha Phapakithi</Text>
-            <Text style={styles.email}>RutrichaPhapakithi@gmail.com</Text>
-          </View>
-        </View>
+          <Text style={styles.name}>{userInfo?.driverName || 'User Name'}</Text>
+        </LinearGradient>
       </View>
 
       <View style={styles.menu}>
         <Text style={styles.sectionTitle}>Tài khoản</Text>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ProfileDetailsScreen')}>
           <Icon name="person-outline" size={24} color="#ff4d4d" />
           <Text style={styles.menuItemText}>Thông tin cá nhân</Text>
         </TouchableOpacity>
@@ -53,9 +90,11 @@ const AccountScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.logoutButton}>
-        <Icon name="log-out-outline" size={24} color="#fff" />
-        <Text style={styles.logoutButtonText}>Đăng xuất</Text>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <LinearGradient colors={['#04BF45', '#1C9546']} style={styles.gradient}>
+          <Icon name="log-out-outline" size={24} color="#fff" />
+          <Text style={styles.logoutButtonText}>Đăng xuất</Text>
+        </LinearGradient>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -66,37 +105,27 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#fff',
   },
+  headerContainer: {
+    overflow: 'hidden',
+    borderRadius: 24,
+  },
   header: {
-    backgroundColor: '#00a676',
-    paddingHorizontal: 16,
-    paddingTop: 40,
-    paddingBottom: 16,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
-  },
-  backButton: {
-    position: 'absolute',
-    top: 48,
-    left: 16,
-  },
-  profileInfo: {
-    flexDirection: 'row',
+    paddingTop: 64,
+    paddingBottom: 24,
+    paddingHorizontal: 24,
     alignItems: 'center',
   },
   avatar: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginRight: 16,
+    marginTop: 10,
   },
   name: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  email: {
-    color: '#fff',
-    fontSize: 14,
+    marginTop: 10,
   },
   menu: {
     paddingHorizontal: 16,
@@ -119,18 +148,24 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#00a676',
-    padding: 16,
-    margin: 16,
-    borderRadius: 8,
+    width: width * 0.9,
+    borderRadius: 20,
+    overflow: 'hidden',
+    margin: 20,
+    alignSelf: 'center',
   },
   logoutButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     marginLeft: 8,
+    fontWeight: 'bold',
+  },
+  gradient: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    height: 50,
+    alignItems: 'center',
+    borderRadius: 24,
   },
 });
 
