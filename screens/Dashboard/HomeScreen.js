@@ -13,6 +13,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomHeader from '../../components/CustomHeader';
 import { firebase_auth } from '../../firebase/firebaseConfig';
+import messaging from '@react-native-firebase/messaging';
+
 
 const { width } = Dimensions.get('window');
 
@@ -88,6 +90,32 @@ const HomeScreen = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    const getTokenAndSave = async () => {
+      try {
+        const fcmToken = await messaging().getToken();
+        if (fcmToken) {
+          // Optionally: check if the token is already saved to avoid redundant API calls
+          await fetch('http://10.0.2.2:4003/api/save-token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: driverEmail,  // Use actual user ID/email
+              fcmToken,
+            }),
+          });
+        }
+      } catch (error) {
+        console.error('Failed to get/save FCM token:', error);
+        Alert.alert('Notification Error', 'Failed to register for push notifications.');
+      }
+    };
+
+    getTokenAndSave();
+  }, [driverEmail]);  // Run when driverEmail is available
 
   const handleAcceptOrder = async (code) => {
     if (!driverEmail) {

@@ -5,6 +5,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 
+
+
 const CustomHeader = ({headerName}) => {
   const navigation = useNavigation();
   const handleAccount = () => {
